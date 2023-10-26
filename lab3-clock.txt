@@ -1,0 +1,67 @@
+_clock_init_mm(struct mm_struct *mm)
+{     
+     /*LAB3 EXERCISE 4: YOUR CODE*/ 
+     // Initialize pra_list_head as an empty linked list
+     list_init(&pra_list_head);
+     
+     // Initialize curr_ptr to point to pra_list_head
+     curr_ptr = &pra_list_head;
+     
+     // Set mm's sm_priv pointer to pra_list_head
+     mm->sm_priv = &pra_list_head;
+     
+     //cprintf(" mm->sm_priv %x in fifo_init_mm\n",mm->sm_priv);
+     return 0;
+}
+
+
+static int
+_clock_map_swappable(struct mm_struct *mm, uintptr_t addr, struct Page *page, int swap_in)
+{
+    list_entry_t *entry = &(page->pra_page_link);
+ 
+    assert(entry != NULL && curr_ptr != NULL);
+    
+    // Link the page to the back of pra_list_head
+    list_add(&pra_list_head, entry);
+    
+    // Set the visited flag of the page to 1
+    page->visited = 1;
+    
+    return 0;
+}
+
+
+static int
+_clock_swap_out_victim(struct mm_struct *mm, struct Page **ptr_page, int in_tick)
+{
+    list_entry_t *head = (list_entry_t*) mm->sm_priv;
+    assert(head != NULL);
+    assert(in_tick == 0);
+    
+    /* Select the victim */
+    //(1)  unlink the  earliest arrival page in front of pra_list_head qeueue
+    //(2)  set the addr of addr of this page to ptr_page
+    while (1) {
+        /*LAB3 EXERCISE 4: YOUR CODE*/ 
+        // Traverse the pra_list_head to find the earliest unvisited page
+        list_entry_t *entry = list_next(head);
+        struct Page *page = le2page(entry, pra_page_link);
+        
+        // If the current page is unvisited, remove it from the list and assign its pointer to ptr_page
+        if (page->visited == 0) {
+            list_del(entry);
+            *ptr_page = page;
+            break;
+        }
+        
+        // If the current page is visited, set its visited flag to 0
+        page->visited = 0;
+        
+        // Move to the next entry
+        entry = list_next(entry);
+    }
+    
+    return 0;
+}
+
