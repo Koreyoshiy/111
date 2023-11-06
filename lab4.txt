@@ -143,3 +143,23 @@ kern/process/proc.c:82:6: note: declared here
  void switch_to(struct context *from, struct context *to);
       ^~~~~~~~~
 make: *** [Makefile:120: obj/kern/process/proc.o] Error 1
+
+
+
+再次更正：
+// Exercise 3: proc_run
+void
+proc_run(struct proc_struct *proc) {
+    if (proc != current) {
+        bool intr_flag;
+        local_intr_save(intr_flag); // Disable interrupts
+        {
+            struct proc_struct *prev = current, *next = proc; // Define previous and next process
+            current = proc;
+            // load_esp0(proc->kstack + KSTACKSIZE); // Modify this line according to your environment
+            lcr3(PADDR(proc->cr3)); // Modify the value of CR3 register
+            switch_to(&(prev->context), &(next->context)); // Context switching between two processes
+        }
+        local_intr_restore(intr_flag); // Enable Interrupts
+    }
+}
