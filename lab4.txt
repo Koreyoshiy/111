@@ -84,3 +84,62 @@ proc_run(struct proc_struct *proc) {
         local_intr_restore(intr_flag); // Enable Interrupts
     }
 }
+
++ cc kern/init/entry.S
++ cc kern/init/init.c
+kern/init/init.c: In function 'grade_backtrace1':
+kern/init/init.c:58:28: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     grade_backtrace2(arg0, (int)&arg0, arg1, (int)&arg1);
+                            ^
+kern/init/init.c:58:46: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     grade_backtrace2(arg0, (int)&arg0, arg1, (int)&arg1);
+                                              ^
+kern/init/init.c: In function 'grade_backtrace':
+kern/init/init.c:68:25: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     grade_backtrace0(0, (int)kern_init, 0xffff0000);
+                         ^
++ cc kern/libs/readline.c
++ cc kern/libs/stdio.c
++ cc kern/debug/kdebug.c
++ cc kern/debug/kmonitor.c
++ cc kern/debug/panic.c
++ cc kern/driver/clock.c
++ cc kern/driver/console.c
++ cc kern/driver/ide.c
++ cc kern/driver/intr.c
++ cc kern/driver/picirq.c
++ cc kern/trap/trap.c
++ cc kern/trap/trapentry.S
++ cc kern/mm/default_pmm.c
++ cc kern/mm/kmalloc.c
+kern/mm/kmalloc.c: In function '__slob_free_pages':
+kern/mm/kmalloc.c:92:23: warning: passing argument 1 of 'kva2page' makes pointer from integer without a cast [-Wint-conversion]
+   free_pages(kva2page(kva), 1 << order);
+                       ^~~
+In file included from kern/mm/kmalloc.c:7:
+kern/mm/pmm.h:109:16: note: expected 'void *' but argument is of type 'long unsigned int'
+ kva2page(void *kva) {
+          ~~~~~~^~~
++ cc kern/mm/pmm.c
++ cc kern/mm/swap.c
++ cc kern/mm/swap_fifo.c
++ cc kern/mm/vmm.c
++ cc kern/fs/swapfs.c
++ cc kern/process/entry.S
++ cc kern/process/proc.c
+kern/process/proc.c: In function 'alloc_proc':
+kern/process/proc.c:109:30: error: 'false' undeclared (first use in this function)
+         proc->need_resched = false;                     // Bool value: need to be rescheduled to release CPU?
+                              ^~~~~
+kern/process/proc.c:109:30: note: each undeclared identifier is reported only once for each function it appears in
+kern/process/proc.c: In function 'proc_run':
+kern/process/proc.c:191:13: warning: implicit declaration of function 'load_esp0' [-Wimplicit-function-declaration]
+             load_esp0(proc->kstack + KSTACKSIZE);
+             ^~~~~~~~~
+kern/process/proc.c:193:13: error: too few arguments to function 'switch_to'
+             switch_to(&(current->context)); // Context switching between two processes
+             ^~~~~~~~~
+kern/process/proc.c:82:6: note: declared here
+ void switch_to(struct context *from, struct context *to);
+      ^~~~~~~~~
+make: *** [Makefile:120: obj/kern/process/proc.o] Error 1
