@@ -1,3 +1,13 @@
+fork_out:
+    return ret;
+
+bad_fork_cleanup_kstack:
+    put_kstack(proc);
+bad_fork_cleanup_proc:
+    kfree(proc);
+    goto fork_out;
+
+
 // Exercise 1: alloc_proc
 static struct proc_struct *
 alloc_proc(void) {
