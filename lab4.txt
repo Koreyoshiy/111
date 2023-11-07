@@ -1,3 +1,8 @@
+            swap_in(mm, addr, &page);
+            page_insert(mm->pgdir, page, addr, perm); 
+            swap_map_swappable(mm, addr, page, 1); 
+            page->pra_vaddr = addr;
+
 fork_out:
     return ret;
 
